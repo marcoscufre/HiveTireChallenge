@@ -17,7 +17,7 @@ Debes trabajar sobre los modelos existentes en `core/models.py` y debes desarrol
 
 ```bash
 # 1. Clonar el repositorio
-git clone <url-del-repositorio>
+git clone git@github.com:josemiguel-chvz/hivetire-challenge.git
 cd hivetire-challenge
 
 # 2. Crear y activar el entorno virtual
