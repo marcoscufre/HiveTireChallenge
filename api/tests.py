@@ -33,3 +33,46 @@ class InspectionCreateTests(TestCase):
 
         self.assertEqual(response.status_code, 409)
         self.assertEqual(VehicleInspection.objects.count(), 1)
+
+    def test_create_and_finalize_inspection(self):
+        create_response = self.client.post(
+            reverse("inspection-list-create"),
+            {
+                "vehicle_id": self.vehicle.id,
+                "odometer_km": 1200,
+            },
+            format="json",
+        )
+
+        self.assertEqual(create_response.status_code, 201)
+        self.assertEqual(create_response.data["status"], 1)
+        self.assertEqual(create_response.data["vehicle_id"], self.vehicle.id)
+
+        inspection_id = create_response.data["id"]
+
+        finalize_response = self.client.patch(
+            reverse("inspection-finalize", kwargs={"pk": inspection_id}),
+            format="json",
+        )
+
+        self.assertEqual(finalize_response.status_code, 200)
+        self.assertEqual(finalize_response.data["status"], 2)
+
+        inspection = VehicleInspection.objects.get(id=inspection_id)
+        self.assertEqual(inspection.status, 2)
+
+    def test_cannot_create_inspection_for_inactive_vehicle(self):
+        self.vehicle.active = False
+        self.vehicle.save(update_fields=["active"])
+
+        response = self.client.post(
+            reverse("inspection-list-create"),
+            {
+                "vehicle_id": self.vehicle.id,
+                "odometer_km": 1200,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(VehicleInspection.objects.count(), 0)
