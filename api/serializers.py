@@ -37,6 +37,7 @@ class InspectionListSerializer(serializers.ModelSerializer):
 class LastInspectionSerializer(serializers.ModelSerializer):
     status = serializers.CharField(source="get_status_display")
     odometer_km = serializers.FloatField(source="odometer")
+    date =serializers.DateTimeField(format="%Y-%m-%d")
 
     class Meta:
         model = VehicleInspection
